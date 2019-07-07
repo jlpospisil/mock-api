@@ -27,9 +27,13 @@ server.use(jsonServer.bodyParser)
 // JWT setup
 const findUser = ({ username, password }) =>  users.find(user => username === user.username && password === user.password);
 const createToken = (payload) => jwt.sign(payload, secret, { expiresIn: ttl });
-const verifyToken = (token) => jwt.verify(token, secret, (err, decode) => decode || err);
+const verifyToken = (token) => jwt.verify(token, secret, (err, decode) => {
+  if (decode === undefined) throw err;
+  return decode;
+});
 const isAuthenticated = (credentials) => !!findUser(credentials);
 
+// Create auth route
 server.post(loginUrl, (req, res) => {
   const { body: credentials = {} } = req;
 
@@ -40,6 +44,25 @@ server.post(loginUrl, (req, res) => {
   } else {
     res.status(401).end();
   }
+});
+
+// Add JWT auth middleware
+server.use((req, res, next) => {
+  const {
+    headers: {
+      authorization = '',
+    } = {}
+  } = req;
+  const [authType, authToken] = authorization.split(' ');
+
+  if (authType === 'Bearer') {
+    try {
+      verifyToken(authToken);
+      next();
+    } catch (err) { }
+  }
+
+  res.status(401).end();
 });
 
 // Start server
