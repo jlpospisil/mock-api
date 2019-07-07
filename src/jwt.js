@@ -59,10 +59,11 @@ server.use((req, res, next) => {
     try {
       verifyToken(authToken);
       next();
+      return;
     } catch (err) { }
   }
 
-  res.status(401).end();
+  res.status(401).end().send();
 });
 
 // Start server
