@@ -1,0 +1,14 @@
+{
+  "name": "mock-api",
+  "version": "0.0.1",
+  "description": "Mock API for use during development",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json-server": "^0.15.0"
+  }
+}
