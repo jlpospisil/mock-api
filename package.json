@@ -4,11 +4,14 @@
   "description": "Mock API for use during development",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve": "json-server --watch src/data/index.js",
+    "serve:jwt-auth": "node src/jwt.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "json-server": "^0.15.0"
+    "faker": "^4.1.0",
+    "json-server": "^0.15.0",
+    "jsonwebtoken": "^8.5.1"
   }
 }
