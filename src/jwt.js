@@ -2,6 +2,7 @@ const jsonServer = require('json-server');
 const jwt = require('jsonwebtoken');
 const config = require('./config');
 const users = require('./data/users');
+const JWT = require('./dto/jwt');
 
 // JWT settings
 const {
@@ -25,24 +26,23 @@ server.use(middlewares);
 server.use(jsonServer.bodyParser)
 
 // JWT setup
-const findUser = ({ username, password }) =>  users.find(user => username === user.username && password === user.password);
+const getAuthenticatedUser = ({ username, password }) =>  users.find(user => username === user.username && password === user.password);
 const createToken = (payload) => jwt.sign(payload, secret, { expiresIn: ttl });
 const verifyToken = (token) => jwt.verify(token, secret, (err, decode) => {
   if (decode === undefined) throw err;
   return decode;
 });
-const isAuthenticated = (credentials) => !!findUser(credentials);
 
 // Create auth route
 server.post(loginUrl, (req, res) => {
   const { body: credentials = {} } = req;
+  const { password, ...user } = getAuthenticatedUser(credentials);
 
-  if (isAuthenticated(credentials)) {
-    res.status(200).jsonp({
-      token: createToken(credentials)
-    });
+  if (!!user) {
+    const jwt = new JWT({ token: createToken(credentials) });
+    res.status(200).jsonp({ user, jwt });
   } else {
-    res.status(401).end();
+    res.status(401).send();
   }
 });
 
@@ -63,7 +63,7 @@ server.use((req, res, next) => {
     } catch (err) { }
   }
 
-  res.status(401).end().send();
+  res.status(401).send();
 });
 
 // Start server

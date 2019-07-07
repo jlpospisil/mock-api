@@ -1,5 +1,5 @@
 const config = require('../config');
-const User = require('./dto/user');
+const User = require('../dto/user');
 
 const {
   user: {
